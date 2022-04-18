@@ -78,7 +78,7 @@ class ViewController: UIViewController {
 
     
     var people: [NSManagedObject] = []
-
+    let appDelegate = UIApplication.shared.delegate as? AppDelegate
 
     
     override func viewDidLoad() {
@@ -137,5 +137,30 @@ extension ViewController: UITableViewDataSource {
       person.value(forKeyPath: "name") as? String
     return cell
   }
+    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+            return 120
+        }
+        func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+            
+            if editingStyle == .delete {
+                let managedContext =
+                    appDelegate!.persistentContainer.viewContext
+                
+                managedContext.delete(people[indexPath.row])
+                
+                
+                do {
+                    try  managedContext.save()
+                    
+                    people.remove(at: indexPath.row)
+                    
+                    tableViewcore.deleteRows(at: [indexPath], with: .fade)
+                } catch {
+                    let saveError = error as NSError
+                    print(saveError)
+                }
+            }
+        }
 }
 
